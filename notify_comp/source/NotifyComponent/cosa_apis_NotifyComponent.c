@@ -28,6 +28,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <bsd/string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <errno.h>
@@ -993,7 +994,7 @@ void UpdateNotifyParamFile()
 	}
 	PNotify_param temp = head;
 	while (temp != NULL) {
-		_ansc_sprintf(str, "0x%08u:%s\n", temp->Notify_PA, temp->param_name);
+		snprintf(str, sizeof(str), "0x%08u:%s\n", temp->Notify_PA, temp->param_name);   //CID:190147
 		fprintf(fptr, "%s", str);
 		temp = temp->next;
 	}
@@ -1040,7 +1041,7 @@ void ReloadNotifyParam()
 		if(chPtr != NULL)
 		{
 			chPtr += 2; //Ignore the "0x" in the PA_Name_MASK
-			strncpy(chPA_Name_MASK,chPtr,strlen(chPtr));
+			snprintf(chPA_Name_MASK, sizeof(chPA_Name_MASK), "%s", chPtr);    //CID:190161
 		}
 		else
 		{
@@ -1049,7 +1050,7 @@ void ReloadNotifyParam()
 
 		chPtr = strtok(NULL, chDelim);
 		if(chPtr != NULL)
-			strncpy(chParam_Name,chPtr,strlen(chPtr));
+                        snprintf(chParam_Name, sizeof(chParam_Name), "%s", chPtr);      //CID:190161
 		else
 		{
 			continue; //failsafe
@@ -1058,7 +1059,7 @@ void ReloadNotifyParam()
 				sizeof(Notify_param));
 
 		if (new_node) {
-			_ansc_strcpy(new_node->param_name, chParam_Name);
+			strlcpy(new_node->param_name, chParam_Name, sizeof(new_node->param_name));    //CID:190148
 			new_node->Notify_PA = atoi(chPA_Name_MASK);
 			new_node->next = NULL;
 
