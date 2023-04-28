@@ -28,7 +28,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <bsd/string.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <errno.h>
@@ -1059,7 +1059,13 @@ void ReloadNotifyParam()
 				sizeof(Notify_param));
 
 		if (new_node) {
-			strlcpy(new_node->param_name, chParam_Name, sizeof(new_node->param_name));    //CID:190148
+			/* chParam_Name is upto 1024 bytes, new_node->param_name is 256 bytes, so we need to handle truncation */
+			size_t len = strlen(chParam_Name);
+			if (len >= sizeof(new_node->param_name))
+				len = sizeof(new_node->param_name) - 1;
+			memcpy(new_node->param_name, chParam_Name, len);
+			new_node->param_name[len] = 0;
+
 			new_node->Notify_PA = atoi(chPA_Name_MASK);
 			new_node->next = NULL;
 
