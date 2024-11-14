@@ -127,4 +127,6 @@ void Find_Param(char* param_name, char* MsgStr);
 void Notify_To_PAs(UINT PA_Bits, char* MsgStr);
 void ReloadNotifyParam();
 void UpdateNotifyParamFile();
+void CreateEventHandlerThread();
+void *Event_HandlerThread(void *threadid);
 #endif

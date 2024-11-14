@@ -63,6 +63,17 @@
 #define NotifyMask_MESH     0x00000020
 #endif
 
+#if defined(UNIT_TEST_DOCKER_SUPPORT)
+    extern FILE* fopen_mock(const char* filename, const char* mode);
+    #define fopen  fopen_mock    // Mock fopen for testing
+    extern int numLoops;
+    #define FOREVER()    numLoops--  // Loop control for testing
+
+#else
+    #define FOREVER()    1           // Infinite loop
+
+#endif
+
 #define CCSP_DBUS_PATH_MS            "/com/cisco/spvtg/ccsp/MS"
 #define CCSP_DBUS_INTERFACE_TR069PA  "eRT.com.cisco.spvtg.ccsp.tr069pa"
 #define TR069_CONNECTED_CLIENT_PARAM "Device.TR069Notify.X_RDKCENTRAL-COM_Connected-Client"
@@ -506,9 +517,9 @@ Find_Param(char* param_name, char* MsgStr)
 		if(param_name && strstr(temp->param_name,param_name))
 		{
 			CcspNotifyCompTraceInfo((" \n Notification : Parameter %s found in the list \n", param_name));
-			Notify_To_PAs(temp->Notify_PA, MsgStr);	
+			Notify_To_PAs(temp->Notify_PA, MsgStr); 
 			found = 1;
-			break;	
+			break;  
 		}
 		temp = temp->next;
 	}
@@ -965,8 +976,10 @@ void* Event_HandlerThread(void *threadid)
 		Find_Param(p_notify_param_name, setnotify_param);
 		CcspNotifyCompTraceInfo((" \n Notification : Msg processed\n"));
         }
-    } while(1);
-   pthread_exit(NULL);
+    } while (FOREVER());
+#ifndef UNIT_TEST_DOCKER_SUPPORT
+    pthread_exit(NULL);
+#endif
 }
 
 void CreateEventHandlerThread()

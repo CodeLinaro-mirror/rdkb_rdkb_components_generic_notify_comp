@@ -25,23 +25,22 @@ AC_CONFIG_SRCDIR([])
 AM_CONFIG_HEADER(cfg/config.h)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([cfg])
-AM_INIT_AUTOMAKE([foreign no-dist-gzip dist-bzip2 1.9])
+AM_INIT_AUTOMAKE([foreign no-dist-gzip dist-bzip2 1.9 subdir-objects])
 LT_INIT
-GTEST_ENABLE_FLAG = ""
 
-AC_ARG_ENABLE([gtestapp],
-             AS_HELP_STRING([--enable-gtestapp],[enable Gtest support (default is no)]),
+AC_ARG_ENABLE([unitTestDockerSupport],
+             AS_HELP_STRING([--enable-unitTestDockerSupport],[enable docker support for unit testing (default is no)]),
              [
+              UNIT_TEST_DOCKER_SUPPORT=""
               case "${enableval}" in
-               yes) GTEST_SUPPORT_ENABLED=true
-                    GTEST_ENABLE_FLAG="-DGTEST_ENABLE"
+               yes) UNIT_TEST_DOCKER_SUPPORT=true
                     m4_if(m4_sysval,[0],[AC_CONFIG_FILES([source/test/Makefile])]);;
-               no) GTEST_SUPPORT_ENABLED=false AC_MSG_ERROR([Gtest support is disabled]);;
-               *) AC_MSG_ERROR([bad value ${enableval} for --enable-gtestapp ]);;
+               no) UNIT_TEST_DOCKER_SUPPORT=false AC_MSG_ERROR([Gtest support is disabled]);;
+               *) AC_MSG_ERROR([bad value ${enableval} for --enable-unitTestDockerSupport ]);;
               esac
              ],
-             [echo "Gtestapp is disabled"])
-AM_CONDITIONAL([WITH_GTEST_SUPPORT], [test x$GTEST_SUPPORT_ENABLED = xtrue])
+             [echo "Docker support is disabled"])
+AM_CONDITIONAL([UNIT_TEST_DOCKER_SUPPORT], [test x$UNIT_TEST_DOCKER_SUPPORT = xtrue])
 dnl subdirectories.
 SUBDIRS=""
 
@@ -82,5 +81,5 @@ PKG_CHECK_MODULES([DBUS],[dbus-1 >= 1.6.18])
 AC_CONFIG_FILES([Makefile
 		source/Makefile
 		source/NotifyComponent/Makefile])
-AC_SUBST(GTEST_ENABLE_FLAG)
+AC_SUBST(UNIT_TEST_DOCKER_SUPPORT)
 AC_OUTPUT
